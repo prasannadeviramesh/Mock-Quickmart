@@ -32,5 +32,6 @@ A modern and responsive mock e-commerce website built with HTML, CSS, and JavaSc
 - Frontend: HTML, CSS, JavaScript
 - backend:nodejs(file name:server.js)
 - Version Control: Git & GitHub
-- By: 
+
+  By:
 📧 [prasannadeviramesh.r@gmail.com](mailto:prasannadeviramesh.r@gmail.com)
