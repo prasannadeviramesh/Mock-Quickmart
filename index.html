@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Ecom</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Navigation */
+        .nav { background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 1rem 0; margin-bottom: 2rem; position: sticky; top: 0; z-index: 100; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 500; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.2s; }
+        .nav-links a:hover { background-color: #f0f0f0; }
+        .nav-links a.active { background: #007bff; color: white; }
+        
+        /* Products */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; padding: 2rem 0; }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+        .product-image { width: 100%; height: 200px; object-fit: cover; }
+        .product-info { padding: 1.5rem; }
+        .product-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: #333; }
+        .product-price { font-size: 1.5rem; font-weight: 700; color: #007bff; margin: 1rem 0; }
+        .product-description { color: #666; margin-bottom: 1rem; line-height: 1.4; }
+        
+        /* Buttons */
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary { background: #007bff; color: white; width: 100%; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #545b62; }
+        
+        /* Cart */
+        .cart-items { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .cart-item { display: flex; align-items: center; padding: 1.5rem; border-bottom: 1px solid #eee; gap: 1rem; }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item-image { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
+        .cart-item-details { flex: 1; }
+        .cart-item-name { font-weight: 600; margin-bottom: 0.5rem; }
+        .cart-item-price { color: #007bff; font-weight: 600; }
+        .cart-item-quantity { display: flex; align-items: center; gap: 1rem; margin: 0 1rem; }
+        .quantity-btn { background: #f8f9fa; border: 1px solid #dee2e6; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
+        .quantity-btn:hover { background: #e9ecef; }
+        
+        /* Checkout */
+        .checkout-form { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+        .form-group input:focus { outline: none; border-color: #007bff; box-shadow: 0 0 0 2px rgba(0,123,255,0.25); }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+        .modal { background: white; border-radius: 8px; padding: 2rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.5rem; font-weight: 700; color: #28a745; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; padding: 0; width: 30px; height: 30px; }
+        .close-btn:hover { color: #333; }
+        
+        /* Receipt */
+        .receipt-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+        .receipt-total { font-size: 1.25rem; font-weight: 700; color: #007bff; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #eee; }
+        
+        /* Pages */
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        /* Cart total */
+        .cart-total { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+        .total-amount { font-size: 2rem; font-weight: 700; color: #007bff; margin: 1rem 0; }
+        
+        /* Empty states */
+        .empty-state { text-align: center; padding: 4rem 2rem; }
+        .empty-state h2 { margin-bottom: 1rem; color: #666; }
+        
+        /* Flash Notifications */
+        .flash-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .flash-notification.show {
+            transform: translateX(0);
+        }
+        
+        .flash-success {
+            background: #28a745;
+        }
+        
+        .flash-error {
+            background: #1fe500;
+        }
+        
+        .flash-info {
+            background: #17a2b8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+            .cart-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .cart-item-quantity { margin: 0; align-self: stretch; justify-content: space-between; }
+            .nav-links { gap: 1rem; }
+            .nav-content { flex-direction: column; gap: 1rem; }
+            .flash-notification {
+                left: 20px;
+                right: 20px;
+                transform: translateY(-100px);
+            }
+            .flash-notification.show {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Flash Notifications Container -->
+    <div id="flashContainer"></div>
+
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <h1>QuickMart 🛒</h1>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="showPage('products')" class="active">Products</a></li>
+                    <li><a href="#" onclick="showPage('cart')">Cart (<span id="cartCount">0</span>)</a></li>
+                    <li><a href="#" onclick="showPage('checkout')">Checkout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Products Page -->
+        <div id="products" class="page active">
+            <h1 style="margin-bottom: 2rem; text-align: center;">Our Products</h1>
+            <div class="products-grid" id="productsGrid">
+                <div class="empty-state">
+                    <h2>Loading products...</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Page -->
+        <div id="cart" class="page">
+            <h1 style="margin-bottom: 2rem;">Shopping Cart</h1>
+            <div class="cart-items" id="cartItems">
+                <div class="empty-state">
+                    <h2>Your cart is empty</h2>
+                    <p style="margin-bottom: 2rem;">Add some products to get started!</p>
+                    <button class="btn btn-primary" onclick="showPage('products')">Continue Shopping</button>
+                </div>
+            </div>
+            <div class="cart-total" id="cartTotalSection" style="display: none;">
+                <h2>Total: ₹<span id="cartTotal">0.00</span></h2>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="showPage('products')">Continue Shopping</button>
+                    <button class="btn btn-success" onclick="showPage('checkout')">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Page -->
+        <div id="checkout" class="page">
+            <h1 style="margin-bottom: 2rem; text-align: center;">Checkout</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h2 style="margin-bottom: 1rem;">Order Summary</h2>
+                    <div id="checkoutItems">
+                        <div class="empty-state" style="padding: 2rem;">
+                            <h2>Your cart is empty</h2>
+                            <p>Add some products to checkout!</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <form id="checkoutForm" class="checkout-form">
+                        <h2 style="margin-bottom: 1.5rem;">Customer Information</h2>
+                        
+                        <div id="checkoutError" style="display: none; color: red; background: #ffe6e6; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                            Error message
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required placeholder="Enter your email">
+                        </div>
+
+                        <button type="submit" class="btn btn-success" style="width: 100%; margin-bottom: 1rem;">Complete Purchase</button>
+                        <button type="button" class="btn btn-secondary" onclick="showPage('cart')" style="width: 100%;">Back to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Order Confirmed! 🎉</h2>
+                <button class="close-btn" onclick="closeReceipt()">×</button>
+            </div>
+            <div id="receiptContent">
+                <!-- Receipt content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let cart = [];
+        let cartTotal = 0;
+
+        // Flash Notification System
+        function showFlash(message, type = 'info') {
+            const flashContainer = document.getElementById('flashContainer');
+            const notification = document.createElement('div');
+            notification.className = `flash-notification flash-${type}`;
+            notification.textContent = message;
+            
+            flashContainer.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Remove notification after 4 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Navigation
+        function showPage(pageName) {
+            // Update active page
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            document.getElementById(pageName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load page content
+            if (pageName === 'products') loadProducts();
+            if (pageName === 'cart') loadCart();
+            if (pageName === 'checkout') loadCheckout();
+        }
+
+        // Load Products
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_BASE}/products`);
+                const products = await response.json();
+                
+                const grid = document.getElementById('productsGrid');
+                grid.innerHTML = products.map(product => `
+                    <div class="product-card">
+                        <img src="${product.image}" alt="${product.name}" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="product-description">${product.description}</p>
+                            <div class="product-price">₹${product.price}</div>
+                            <button class="btn btn-primary" onclick="addToCart(${product.id})">Add to Cart</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productsGrid').innerHTML = `
+                    <div class="empty-state">
+                        <h2>Failed to load products</h2>
+                        <button class="btn btn-primary" onclick="loadProducts()">Try Again</button>
+                    </div>
+                `;
+                showFlash('Failed to load products. Please check your connection.', 'error');
+            }
+        }
+
+        // Cart Functions - UPDATED VERSION
+        async function addToCart(productId) {
+            try {
+                console.log('Adding product to cart:', productId);
+                
+                const response = await fetch(`${API_BASE}/cart`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId, quantity: 1 })
+                });
+                
+                // Check if response is successful
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Cart update successful:', data);
+                updateCartUI(data);
+                
+                // Show success feedback
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Added!';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+                
+                showFlash('Product added to cart successfully!', 'success');
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showFlash('Product added to cart successfully!', 'error');
+            }
+        }
+
+        async function removeFromCart(productId) {
+            try {
+                const response = await fetch(`${API_BASE}/cart/${productId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                updateCartUI(data);
+                showFlash('Item removed from cart.', 'info');
+            } catch (error) {
+                console.error('Error removing from cart:', error);
+                showFlash('Failed to remove item from cart.', 'error');
+            }
+        }
+
+        async function updateQuantity(productId, newQuantity) {
+            if (newQuantity < 1) {
+                removeFromCart(productId);
+                return;
+            }
+
+            // For simplicity, remove and re-add with new quantity
+            await removeFromCart(productId);
+            await addToCart(productId, newQuantity);
+        }
+
+        function updateCartUI(data) {
+            cart = data.items;
+            cartTotal = data.total;
+            document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        }
+
+        async function loadCart() {
+            try {
+                const response = await fetch(`${API_BASE}/cart`);
+                const data = await response.json();
+                updateCartUI(data);
+                
+                const cartItems = document.getElementById('cartItems');
+                const cartTotalSection = document.getElementById('cartTotalSection');
+                
+                if (cart.length === 0) {
+                    cartItems.innerHTML = `
+                        <div class="empty-state">
+                            <h2>Your cart is empty</h2>
+                            <p style="margin-bottom: 2rem;">Add some products to get started!</p>
+                            <button class="btn btn-primary" onclick="showPage('products')">Continue Shopping</button>
+                        </div>
+                    `;
+                    cartTotalSection.style.display = 'none';
+                } else {
+                    cartItems.innerHTML = cart.map(item => `
+                        <div class="cart-item">
+                            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${item.name}</div>
+                                <div class="cart-item-price">₹${item.price} each</div>
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                                <span style="font-weight: 600;">${item.quantity}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                            </div>
+                            <div style="font-weight: 600; min-width: 80px; text-align: right;">
+                                ₹${(item.price * item.quantity).toFixed(2)}
+                            </div>
+                            <button class="btn btn-danger" onclick="removeFromCart(${item.id})">Remove</button>
+                        </div>
+                    `).join('');
+                    cartTotalSection.style.display = 'block';
+                }
+                document.getElementById('cartTotal').textContent = cartTotal.toFixed(2);
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                showFlash('Failed to load cart. Please try again.', 'error');
+            }
+        }
+
+        function loadCheckout() {
+            const checkoutItems = document.getElementById('checkoutItems');
+            if (cart.length === 0) {
+                checkoutItems.innerHTML = `
+                    <div class="empty-state" style="padding: 2rem;">
+                        <h2>Your cart is empty</h2>
+                        <p>Add some products to checkout!</p>
+                    </div>
+                `;
+            } else {
+                checkoutItems.innerHTML = `
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        ${cart.map(item => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+                                <div>
+                                    <div style="font-weight: 600;">${item.name}</div>
+                                    <div style="color: #666; font-size: 0.9rem;">Qty: ${item.quantity} × ₹${item.price}</div>
+                                </div>
+                                <div style="font-weight: 600;">₹${(item.price * item.quantity).toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; font-weight: bold; font-size: 1.2rem; border-top: 2px solid #eee; margin-top: 0.5rem;">
+                            <span>Total:</span>
+                            <span>₹${cartTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Checkout
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const errorDiv = document.getElementById('checkoutError');
+
+            // Hide previous errors
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/checkout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cartItems: cart, name, email })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Checkout failed');
+                }
+                
+                const receipt = await response.json();
+                showReceipt(receipt);
+                
+                // Clear form
+                document.getElementById('checkoutForm').reset();
+                showFlash('Order placed successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Checkout error:', error);
+                errorDiv.textContent = 'Checkout failed. Please try again.';
+                errorDiv.style.display = 'block';
+                showFlash('Checkout failed. Please try again.', 'error');
+            }
+        });
+
+        function showReceipt(receipt) {
+            document.getElementById('receiptContent').innerHTML = `
+                <div style="margin-bottom: 1.5rem;">
+                    <p><strong>Order ID:</strong> ${receipt.orderId}</p>
+                    <p><strong>Customer:</strong> ${receipt.customer.name}</p>
+                    <p><strong>Email:</strong> ${receipt.customer.email}</p>
+                    <p><strong>Date:</strong> ${new Date(receipt.timestamp).toLocaleString()}</p>
+                </div>
+
+                <div style="margin: 1.5rem 0;">
+                    <strong>Order Items:</strong>
+                    ${receipt.items.map(item => `
+                        <div class="receipt-item">
+                            <span>${item.name} (x${item.quantity})</span>
+                            <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="receipt-total receipt-item">
+                    <span>Total Amount:</span>
+                    <span>₹${receipt.total.toFixed(2)}</span>
+                </div>
+
+                <div style="margin-top: 2rem; text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                    <p style="color: #28a745; font-weight: 600; margin: 0;">
+                        Thank you for your purchase! Your order is being processed.
+                    </p>
+                </div>
+            `;
+            document.getElementById('receiptModal').style.display = 'flex';
+        }
+
+        function closeReceipt() {
+            document.getElementById('receiptModal').style.display = 'none';
+            // Clear cart after successful order
+            cart = [];
+            cartTotal = 0;
+            document.getElementById('cartCount').textContent = '0';
+            showPage('products');
+            loadCart(); // Refresh cart view
+        }
+
+        // Initialize application
+        loadProducts();
+        loadCart();
+
+        // Handle page refresh
+        window.addEventListener('load', () => {
+            loadCart();
+        });
+    </script>
+</body>
+</html>
