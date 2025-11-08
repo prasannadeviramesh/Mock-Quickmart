@@ -11,6 +11,7 @@ A modern and responsive mock e-commerce website built with HTML, CSS, and JavaSc
 
 💻 Tech Stack
 - Frontend: HTML, CSS, JavaScript
+- backend:nodejs(file name:server.js)
 - Version Control: Git & GitHub
 - Hosting: GitHub Pages
 
