@@ -1,4 +1,4 @@
- Demo: 👉 [Click here to view project  ](https://prasannadeviramesh.github.io/Mock-Quickmart/)
+
 
 Vedio:
 👉 [Click here to view project vedio ](https://www.loom.com/share/ba7b4e7361ff43ac851bd965d31244e2)
