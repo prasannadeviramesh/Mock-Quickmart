@@ -1,7 +1,7 @@
 🚀 Live Demo
 👉 [Click here to view project](https://prasannadeviramesh.github.io/Mock-Quickmart/)
 👉 [Click here to view project vedio ](https://www.loom.com/share/9c9c6c216c5143b6a55f727ba993fff4)
-## 🖼️ Application Screenshots
+##  Application Screenshots
 
 <h3 align="center">🏠 Home Page</h3>
 <p align="center">
